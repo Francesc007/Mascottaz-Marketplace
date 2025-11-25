@@ -58,9 +58,9 @@ export default function NavigationBar() {
   };
 
   return (
-    <nav className="w-full" style={{ backgroundColor: '#1e3a8a' }}>
-      <div className="container mx-auto px-4">
-        <div className="flex justify-center space-x-12 py-4">
+    <nav className="w-full" style={{ backgroundColor: 'var(--interaction-blue)' }}>
+      <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="flex justify-between items-center py-4">
           {mainCategories.map((category, index) => (
             <div
               key={index}
@@ -69,8 +69,11 @@ export default function NavigationBar() {
               onMouseLeave={handleMouseLeave}
             >
               <button
-                className="text-white font-semibold text-lg px-6 py-3 hover:bg-blue-700 rounded-lg transition-all duration-200 min-w-[120px]"
-                style={{ backgroundColor: activeDropdown === index ? '#1d4ed8' : 'transparent' }}
+                className="text-gray-700 font-semibold text-lg px-6 py-3 hover:bg-blue-100 rounded-lg transition-all duration-200 min-w-[120px]"
+                style={{ 
+                  backgroundColor: activeDropdown === index ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
+                  color: 'var(--brand-blue)'
+                }}
               >
                 {category.name}
               </button>

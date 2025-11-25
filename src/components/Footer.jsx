@@ -1,7 +1,11 @@
+"use client";
+
+import Link from "next/link";
+
 export default function Footer() {
     return (
-      <footer className="mt-20" style={{ backgroundColor: '#1e3a8a', color: 'white' }}>
-        <div className="container mx-auto px-4 py-12">
+      <footer className="mt-20" style={{ backgroundColor: 'var(--interaction-blue)', color: '#1e3a8a' }}>
+        <div className="mx-auto max-w-screen-2xl px-8 py-12">
           {/* Contenido principal del footer en 4 columnas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             
@@ -87,23 +91,36 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-bold mb-4">Ayuda y Soporte</h3>
               <div className="space-y-3">
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                <Link href="/politica-envio" className="block transition-colors duration-200 hover:text-blue-800">
                   Política de Envío
-                </a>
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                </Link>
+                <Link href="/devoluciones" className="block transition-colors duration-200 hover:text-blue-800">
                   Política de Devoluciones
-                </a>
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                </Link>
+                <Link href="/faq" className="block transition-colors duration-200 hover:text-blue-800">
                   Preguntas Frecuentes (FAQ)
-                </a>
+                </Link>
+              </div>
+            </div>
+
+            {/* Columna 5: Vender en Mascottaz */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">🏪 Vender en Mascottaz</h3>
+              <div className="space-y-3">
+                <Link 
+                  href="/sell"
+                  className="block transition-colors duration-200 hover:text-blue-800 font-medium"
+                >
+                  Vender en Mascottaz
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Línea divisoria */}
-          <div className="border-t border-blue-300 mt-8 pt-6">
-            <p className="text-center text-sm">
-              © 2025 Pet Place. Todos los derechos reservados. Hecho con ❤️ por Francisco
+          <div className="border-t border-gray-300 mt-8 pt-6">
+            <p className="text-center text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+              © 2025 Mascottaz. Todos los derechos reservados. Hecho con ❤️ por Francisco
             </p>
           </div>
         </div>
