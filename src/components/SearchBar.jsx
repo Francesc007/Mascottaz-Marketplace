@@ -18,22 +18,24 @@ export default function SearchBar() {
 
   return (
     <form onSubmit={handleSearch} className="flex-1 w-full">
-      <div className="relative">
+      <div className="relative flex">
         <input
           type="text"
-          placeholder="Buscar productos..."
+          placeholder="Buscar productos, marcas, categorías..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-3 md:px-4 py-2 pl-9 md:pl-10 pr-20 md:pr-24 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
+          className="flex-1 px-4 py-2.5 pl-10 pr-20 rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base md:text-lg"
           style={{ backgroundColor: '#fff' }}
         />
-        <Search className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 pointer-events-none" />
         <button
           type="submit"
-          className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 px-2 md:px-4 py-1 rounded-md text-xs md:text-sm font-medium transition-colors"
+          className="px-6 py-2.5 rounded-r-md text-base md:text-lg font-medium transition-colors whitespace-nowrap"
           style={{ 
             backgroundColor: 'var(--brand-blue)',
-            color: '#fff'
+            color: '#fff',
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0
           }}
         >
           Buscar

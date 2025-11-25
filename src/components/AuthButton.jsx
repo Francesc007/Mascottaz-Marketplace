@@ -33,13 +33,13 @@ export default function AuthButton() {
     <div className="relative">
       <button
         onClick={toggleMenu}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 font-medium text-base md:text-lg"
         style={{ 
           backgroundColor: 'var(--brand-blue)',
           color: '#fff'
         }}
       >
-        <User className="w-4 h-4" />
+        <User className="w-5 h-5 md:w-6 md:h-6" />
         <span>Iniciar Sesión</span>
       </button>
         

@@ -15,26 +15,26 @@ export default function Header({ cartItems = [] }) {
   const cartItemCount = cartItems?.length || 0;
 
   return (
-    <header className="bg-transparent py-4 border-b border-gray-200">
+    <header className="py-2 md:py-3 border-b border-gray-200" style={{ backgroundColor: '#fffaf0' }}>
       <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
-        {/* Primera fila: Logo y acciones principales */}
-        <div className="flex items-center justify-between gap-2 md:gap-4 mb-3 md:mb-0">
-          {/* Logo a la izquierda */}
+        {/* Layout estilo Amazon/Mercado Libre: Todo en una fila */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Logo a la izquierda - 400x100 */}
           <div className="flex-shrink-0">
-            <Link href="/" className="cursor-pointer">
+            <Link href="/" className="cursor-pointer flex items-center">
               {!imageError ? (
                 <Image
                   src="/MASCOTTAZ.png"
                   alt="Mascottaz logo"
-                  width={200}
-                  height={67}
-                  className="h-[50px] w-[150px] md:h-[67px] md:w-[200px] object-contain"
+                  width={400}
+                  height={100}
+                  className="h-[67px] w-[267px] md:h-[100px] md:w-[400px] object-contain"
                   priority
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="h-[50px] w-[150px] md:h-[67px] md:w-[200px] flex items-center">
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--brand-blue)' }}>
+                <div className="h-[67px] w-[267px] md:h-[100px] md:w-[400px] flex items-center">
+                  <span className="text-2xl md:text-4xl font-bold" style={{ color: 'var(--brand-blue)' }}>
                     MASCOTTAZ
                   </span>
                 </div>
@@ -42,61 +42,45 @@ export default function Header({ cartItems = [] }) {
             </Link>
           </div>
 
-          {/* Botones de acción (móvil) */}
-          <div className="flex items-center gap-2 md:hidden">
-            <button
-              onClick={() => router.push("/carrito")}
-              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ShoppingCart className="w-5 h-5 text-gray-700" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
-            <AuthButton />
+          {/* Código Postal - Solo en desktop */}
+          <div className="hidden md:block flex-shrink-0">
+            <PostalCodeInput />
           </div>
 
-          {/* Botones de acción (desktop) */}
-          <div className="hidden md:flex items-center gap-4">
-            {/* Botón de inicio de sesión */}
-            <div className="flex-shrink-0">
+          {/* Barra de búsqueda - Ocupa el espacio central */}
+          <div className="flex-1 min-w-0 hidden md:block">
+            <SearchBar />
+          </div>
+
+          {/* Botones de acción a la derecha */}
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-auto">
+            {/* Botón de inicio de sesión - Solo desktop */}
+            <div className="hidden md:block">
               <AuthButton />
             </div>
 
             {/* Carrito */}
-            <div className="flex-shrink-0">
-              <button
-                onClick={() => router.push("/carrito")}
-                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <ShoppingCart className="w-6 h-6 text-gray-700" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                    {cartItemCount}
-                  </span>
-                )}
-              </button>
+            <button
+              onClick={() => router.push("/carrito")}
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 md:h-5 md:w-5 flex items-center justify-center font-bold">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+
+            {/* Botón de inicio de sesión - Solo móvil */}
+            <div className="md:hidden">
+              <AuthButton />
             </div>
           </div>
         </div>
 
-        {/* Segunda fila: Código postal y búsqueda (desktop) */}
-        <div className="hidden md:flex items-center justify-between gap-4">
-          {/* Código Postal */}
-          <div className="flex-shrink-0">
-            <PostalCodeInput />
-          </div>
-
-          {/* Barra de búsqueda (centro) */}
-          <div className="flex-1 min-w-0 max-w-2xl mx-4">
-            <SearchBar />
-          </div>
-        </div>
-
-        {/* Segunda fila: Código postal y búsqueda (móvil) */}
-        <div className="flex md:hidden items-center gap-2">
+        {/* Segunda fila móvil: Código postal y búsqueda */}
+        <div className="flex md:hidden items-center gap-2 mt-2">
           <PostalCodeInput />
           <div className="flex-1">
             <SearchBar />
