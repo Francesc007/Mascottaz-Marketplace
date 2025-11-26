@@ -1,12 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import useCartStore from "../store/cartStore";
 
 export default function ProductCard({ product, addToCart }) {
+  const { addItem } = useCartStore();
   const imageUrl = product.imagen || product.image || "/placeholder-product.jpg";
   const productName = product.nombre || product.name;
   const productDescription = product.descripcion || product.description;
   const productPrice = product.precio || product.price;
+
+  const handleAddToCart = () => {
+    if (addToCart) {
+      addToCart(product);
+    } else {
+      addItem(product);
+    }
+  };
 
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow">
@@ -24,15 +34,13 @@ export default function ProductCard({ product, addToCart }) {
       <p className="font-bold text-xl mb-3" style={{ color: 'var(--brand-blue)' }}>
         ${productPrice?.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
       </p>
-      {addToCart && (
-        <button
-          onClick={() => addToCart(product)}
-          className="w-full text-white py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
-          style={{ backgroundColor: 'var(--brand-blue)' }}
-        >
-          Añadir al carrito
-        </button>
-      )}
+      <button
+        onClick={handleAddToCart}
+        className="w-full text-white py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+        style={{ backgroundColor: 'var(--brand-blue)' }}
+      >
+        Añadir al carrito
+      </button>
     </div>
   );
 }

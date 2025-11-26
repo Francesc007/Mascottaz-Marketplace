@@ -4,13 +4,11 @@ import { useParams } from "next/navigation";
 import Header from "../../../../components/Header";
 import Footer from "../../../../components/Footer";
 import NavigationBar from "../../../../components/NavigationBar";
-import { useState } from "react";
 
 export default function CategoryPage() {
   const params = useParams();
   const animal = params.animal;
   const subcategoria = params.subcategoria;
-  const [cartItems] = useState([]);
 
   // Mapeo de categorías disponibles
   const categoryData = {
@@ -50,10 +48,10 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fffaf0' }}>
-      <Header cartItems={cartItems} />
+      <Header />
       <NavigationBar />
       
-      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-4 md:px-8 py-8">
+      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-2 md:px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
             {getCategoryName(animal)} - {getCategoryName(subcategoria)}
@@ -92,4 +90,6 @@ export default function CategoryPage() {
     </div>
   );
 }
+
+
 

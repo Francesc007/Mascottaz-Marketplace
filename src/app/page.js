@@ -1,32 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import NavigationBar from "../components/NavigationBar";
 import DailyDeals from "../components/DailyDeals";
 import CommunityGallery from "../components/CommunityGallery";
-import FloatingCart from "../components/FloatingCart";
-import AuthButton from "../components/AuthButton";
+import useCartStore from "../store/cartStore";
 
 export default function Home() {
-  const [cartItems, setCartItems] = useState([]);
-
-  const removeFromCart = (index) => setCartItems(cartItems.filter((_, i) => i !== index));
+  const { addItem } = useCartStore();
 
   const addToCart = (product) => {
-    setCartItems([...cartItems, {
-      id: product.id,
-      name: product.nombre || product.name,
-      description: product.descripcion || product.description,
-      price: product.precio || product.price,
-      image: product.imagen || product.image
-    }]);
+    addItem(product);
   };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fffaf0' }}>
-      <Header cartItems={cartItems} />
+      <Header />
 
       <main className="flex-1">
         <NavigationBar />
@@ -34,8 +24,6 @@ export default function Home() {
         <DailyDeals addToCart={addToCart} />
         
         <CommunityGallery />
-        
-        <FloatingCart items={cartItems} removeFromCart={removeFromCart} />
       </main>
 
       <Footer />

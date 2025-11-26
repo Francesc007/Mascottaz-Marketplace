@@ -68,3 +68,5 @@ He mejorado el código en `src/lib/supabaseClient.js` para que muestre mensajes 
 
 
 
+
+

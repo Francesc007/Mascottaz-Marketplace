@@ -170,7 +170,7 @@ export default function CommunityGallery() {
 
   if (loading) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         <div className="text-center py-12">
           <p className="text-gray-600">Cargando comunidad...</p>
         </div>
@@ -180,7 +180,7 @@ export default function CommunityGallery() {
 
   if (photos.length === 0) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         <div className="text-center py-12">
           <p className="text-gray-600">Aún no hay fotos en la comunidad</p>
         </div>
@@ -190,7 +190,7 @@ export default function CommunityGallery() {
 
   return (
     <section ref={sectionRef} className="py-8 relative">
-      <div className="max-w-screen-2xl mx-auto px-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
         <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: 'var(--brand-blue)' }}>
           Comunidad Petz Prime
         </h2>

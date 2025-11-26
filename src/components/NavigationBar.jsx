@@ -160,7 +160,7 @@ export default function NavigationBar() {
 
   return (
     <nav className="w-full" style={{ backgroundColor: 'var(--interaction-blue)' }} ref={navRef}>
-      <div className="max-w-screen-2xl mx-auto px-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
         <div className="flex justify-between items-center py-4">
           {mainCategories.map((category, index) => (
             <div

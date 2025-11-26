@@ -13,7 +13,6 @@ export default function SearchPage() {
   const query = searchParams.get("q") || "";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     if (query) {
@@ -47,24 +46,14 @@ export default function SearchPage() {
     }
   };
 
-  const addToCart = (product) => {
-    setCartItems([...cartItems, {
-      id: product.id,
-      name: product.nombre || product.name,
-      description: product.descripcion || product.description,
-      price: product.precio || product.price,
-      image: product.imagen || product.image
-    }]);
-  };
-
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fffaf0' }}>
-      <Header cartItems={cartItems} />
+      <Header />
 
       <main className="flex-1">
         <NavigationBar />
         
-        <div className="max-w-screen-2xl mx-auto px-8 py-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--brand-blue)' }}>
             {query ? `Resultados para "${query}"` : "Buscar productos"}
           </h1>
@@ -82,7 +71,7 @@ export default function SearchPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} addToCart={addToCart} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}
@@ -93,4 +82,6 @@ export default function SearchPage() {
     </div>
   );
 }
+
+
 

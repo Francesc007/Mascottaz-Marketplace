@@ -45,7 +45,7 @@ export default function DailyDeals({ addToCart }) {
 
   if (loading) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         <div className="text-center py-12">
           <p className="text-gray-600">Cargando ofertas...</p>
         </div>
@@ -59,7 +59,7 @@ export default function DailyDeals({ addToCart }) {
 
   return (
     <section className="py-8">
-      <div className="max-w-screen-2xl mx-auto px-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
         <h2 className="text-3xl font-bold mb-6" style={{ color: 'var(--brand-blue)' }}>
           Ofertas del Día
         </h2>

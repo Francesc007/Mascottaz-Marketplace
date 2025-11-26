@@ -1,40 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import NavigationBar from "../../components/NavigationBar";
 import Link from "next/link";
+import useCartStore from "../../store/cartStore";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState([]);
-
-  // Cargar items del localStorage o estado global
-  useEffect(() => {
-    const saved = localStorage.getItem("cartItems");
-    if (saved) {
-      setCartItems(JSON.parse(saved));
-    }
-  }, []);
-
-  const removeFromCart = (index) => {
-    const newItems = cartItems.filter((_, i) => i !== index);
-    setCartItems(newItems);
-    localStorage.setItem("cartItems", JSON.stringify(newItems));
-  };
-
-  const total = cartItems.reduce((sum, item) => sum + (item.price || 0), 0);
+  const { items: cartItems, removeItem, getTotal } = useCartStore();
+  const total = getTotal();
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fffaf0' }}>
-      <Header cartItems={cartItems} />
+      <Header />
 
       <main className="flex-1">
         <NavigationBar />
         
-        <div className="max-w-screen-2xl mx-auto px-8 py-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--brand-blue)' }}>
-            Carrito de Compras
+            Carrito
           </h1>
 
           {cartItems.length === 0 ? (
@@ -57,34 +42,43 @@ export default function CartPage() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {cartItems.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm"
+                      className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow relative"
                     >
-                      <div className="flex items-center gap-4 flex-1">
-                        {item.image && (
+                      {item.image && (
+                        <div className="w-full h-40 mb-3 rounded-lg overflow-hidden">
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-full h-full object-cover"
                           />
-                        )}
-                        <div>
-                          <h3 className="font-medium text-gray-800">{item.name}</h3>
-                          {item.description && (
-                            <p className="text-sm text-gray-600">{item.description}</p>
-                          )}
-                          <p className="text-blue-600 font-bold mt-1">${item.price}</p>
                         </div>
+                      )}
+                      <div className="mb-2">
+                        <h3 className="font-medium text-gray-800 mb-1 line-clamp-2">{item.name}</h3>
+                        {item.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2 mb-2">{item.description}</p>
+                        )}
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-blue-600 font-bold text-lg">
+                            ${(item.price * (item.quantity || 1)).toFixed(2)}
+                          </p>
+                          <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                            Cantidad: {item.quantity || 1}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500">${item.price?.toFixed(2)} c/u</p>
                       </div>
                       <button
-                        onClick={() => removeFromCart(index)}
-                        className="text-red-500 hover:text-red-700 ml-4 p-2"
+                        onClick={() => removeItem(index)}
+                        className="absolute top-3 right-3 text-gray-700 hover:text-gray-900 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
+                        title="Eliminar producto"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
