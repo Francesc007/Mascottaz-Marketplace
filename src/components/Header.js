@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
@@ -13,10 +13,18 @@ import useCartStore from "../store/cartStore";
 export default function Header() {
   const [imageError, setImageError] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [openCPModal, setOpenCPModal] = useState(false);
   const router = useRouter();
   const { items: cartItems, removeItem, incrementQuantity, decrementQuantity, getTotal, getItemCount } = useCartStore();
-  const cartItemCount = getItemCount();
   const total = getTotal();
+
+  // Evitar error de hidratación: solo calcular el contador después de montar en el cliente
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const cartItemCount = isMounted ? getItemCount() : 0;
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -62,7 +70,7 @@ export default function Header() {
 
             {/* Código Postal - Solo en desktop */}
             <div className="hidden md:block flex-shrink-0">
-              <PostalCodeInput />
+              <PostalCodeInput openModal={openCPModal} onModalClose={() => setOpenCPModal(false)} />
             </div>
 
             {/* Barra de búsqueda - Ocupa el espacio central */}
@@ -74,7 +82,7 @@ export default function Header() {
             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-auto">
               {/* Botón de inicio de sesión - Solo desktop */}
               <div className="hidden md:block">
-                <AuthButton />
+                <AuthButton onLoginClick={() => setOpenCPModal(true)} />
               </div>
 
               {/* Carrito - Más grande con círculo azul */}
@@ -85,7 +93,7 @@ export default function Header() {
               >
                 <ShoppingCart className="w-6 h-6 md:w-7 md:h-7 text-white" />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs md:text-sm rounded-full h-5 w-5 md:h-6 md:w-6 flex items-center justify-center font-bold">
+                  <span className="absolute -top-1 -right-1 text-xs md:text-sm rounded-full h-5 w-5 md:h-6 md:w-6 flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--interaction-blue)', color: 'var(--brand-blue)' }}>
                     {cartItemCount}
                   </span>
                 )}
@@ -93,14 +101,14 @@ export default function Header() {
 
               {/* Botón de inicio de sesión - Solo móvil */}
               <div className="md:hidden">
-                <AuthButton />
+                <AuthButton onLoginClick={() => setOpenCPModal(true)} />
               </div>
             </div>
           </div>
 
           {/* Segunda fila móvil: Código postal y búsqueda */}
           <div className="flex md:hidden items-center gap-2 mt-2">
-            <PostalCodeInput />
+            <PostalCodeInput openModal={openCPModal} onModalClose={() => setOpenCPModal(false)} />
             <div className="flex-1">
               <SearchBar />
             </div>
@@ -118,21 +126,59 @@ export default function Header() {
 
       {/* Panel lateral deslizante del carrito */}
       <div
-        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-0 right-0 h-full w-96 shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
           isCartOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{ backgroundColor: '#fffaf0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col h-full">
           {/* Header del carrito */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-800">Carrito</h2>
-            <button
-              onClick={closeCart}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              ×
-            </button>
+          <div className="p-6 border-b border-gray-200" style={{ backgroundColor: 'var(--interaction-blue)' }}>
+            {/* Logo simbólico con sombra suave */}
+            <div className="flex justify-center mb-4">
+              <Link href="/" onClick={closeCart} className="cursor-pointer flex items-center">
+                {!imageError ? (
+                  <Image
+                    src="/MASCOTTAZ.png"
+                    alt="Mascottaz logo"
+                    width={250}
+                    height={63}
+                    className="h-14 w-40 md:h-16 md:w-48 object-contain"
+                    style={{ 
+                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))',
+                      opacity: 0.9
+                    }}
+                    priority
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="h-14 w-40 md:h-16 md:w-48 flex items-center justify-center">
+                    <span 
+                      className="text-xl md:text-2xl font-bold" 
+                      style={{ 
+                        color: 'var(--brand-blue)',
+                        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))',
+                        opacity: 0.9
+                      }}
+                    >
+                      MASCOTTAZ
+                    </span>
+                  </div>
+                )}
+              </Link>
+            </div>
+            
+            {/* Título y botón de cerrar */}
+            <div className="flex items-center justify-between relative">
+              <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">Mi Carrito</h2>
+              <button
+                onClick={closeCart}
+                className="text-gray-500 hover:text-gray-700 text-2xl absolute right-0"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           {/* Contenido del carrito */}
@@ -147,8 +193,8 @@ export default function Header() {
             ) : (
               <div>
                 <div className="mb-4">
-                  <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: '#d1fae5' }}>
-                    <p className="text-green-700 font-semibold text-base text-center">
+                  <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: '#dbeafe' }}>
+                    <p className="text-blue-700 font-semibold text-base text-center">
                       Productos añadidos
                     </p>
                   </div>

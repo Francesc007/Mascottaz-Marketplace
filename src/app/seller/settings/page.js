@@ -446,7 +446,7 @@ export default function SellerSettingsPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fffaf0' }}>
       <header className="shadow-sm" style={{ backgroundColor: 'transparent' }}>
-        <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
           <div className="flex flex-col items-center py-4">
             <div className="flex items-center justify-center mb-4">
               <Link href="/" className="cursor-pointer">
@@ -480,7 +480,7 @@ export default function SellerSettingsPage() {
         </div>
       </header>
 
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-600" />
@@ -1004,6 +1004,7 @@ export default function SellerSettingsPage() {
     </div>
   );
 }
+
 
 
 

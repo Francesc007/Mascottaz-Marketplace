@@ -112,6 +112,15 @@ export function useAuth() {
   const getCurrentUser = async () => {
     try {
       const supabase = createClient();
+      
+      // Primero verificar si hay una sesión activa
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        return { user: null, error: sessionError || new Error('No hay sesión activa') };
+      }
+
+      // Si hay sesión, obtener el usuario
       const { data: { user }, error } = await supabase.auth.getUser();
 
       if (error) {
@@ -126,6 +135,7 @@ export function useAuth() {
 
       return { user, error: null };
     } catch (error) {
+      console.error('Error en getCurrentUser:', error);
       return { user: null, error };
     }
   };

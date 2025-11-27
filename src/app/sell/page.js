@@ -19,7 +19,7 @@ export default function SellPage() {
   return (
     <div style={{ backgroundColor: '#fffaf0' }}>
       <header className="bg-transparent py-6">
-        <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
           <Link href="/" className="flex justify-center">
             <Image
               src="/MASCOTTAZ.png"
@@ -34,7 +34,7 @@ export default function SellPage() {
       </header>
 
       <section className="py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
           <motion.div
             initial="initial"
             animate="animate"
@@ -69,7 +69,7 @@ export default function SellPage() {
       <CallToAction />
 
       <footer className="py-8 bg-gray-900 text-white">
-        <div className="max-w-screen-2xl mx-auto px-8 text-center">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4 text-center">
           <p className="text-sm">
             © 2025 Mascottaz. Todos los derechos reservados.
           </p>
@@ -78,6 +78,7 @@ export default function SellPage() {
     </div>
   );
 }
+
 
 
 

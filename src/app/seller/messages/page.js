@@ -188,7 +188,7 @@ export default function SellerMessagesPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fffaf0' }}>
       <header className="shadow-sm" style={{ backgroundColor: 'transparent' }}>
-        <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
           <div className="flex flex-col items-center py-4">
             <div className="flex items-center justify-center mb-4">
               <Link href="/" className="cursor-pointer">
@@ -222,7 +222,7 @@ export default function SellerMessagesPage() {
         </div>
       </header>
 
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border border-gray-100">
@@ -364,6 +364,7 @@ export default function SellerMessagesPage() {
     </div>
   );
 }
+
 
 
 

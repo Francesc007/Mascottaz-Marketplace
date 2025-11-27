@@ -12,7 +12,7 @@ const fadeUp = {
 export default function Commissions() {
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-screen-2xl mx-auto px-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
         <motion.div
           initial="initial"
           whileInView="animate"
@@ -78,6 +78,7 @@ export default function Commissions() {
     </section>
   );
 }
+
 
 
 

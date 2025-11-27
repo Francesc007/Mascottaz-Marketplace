@@ -138,12 +138,23 @@ export default function NavigationBar() {
     };
   }, [activeDropdown]);
 
-  const handleCategoryClick = (index) => {
-    if (activeDropdown === index) {
-      setActiveDropdown(null);
-    } else {
-      setActiveDropdown(index);
-    }
+  // Abrir menú al pasar el cursor
+  const handleCategoryMouseEnter = (index) => {
+    setActiveDropdown(index);
+  };
+
+  // Cerrar menú cuando el cursor sale completamente del área
+  const handleCategoryMouseLeave = (index) => {
+    // Usar un timeout para permitir que el cursor se mueva al menú desplegable
+    setTimeout(() => {
+      // Solo cerrar si el dropdown activo es el mismo y no hay hover
+      if (activeDropdown === index) {
+        const categoryElement = document.querySelector(`[data-category-wrapper="${index}"]`);
+        if (categoryElement && !categoryElement.matches(':hover')) {
+          setActiveDropdown(null);
+        }
+      }
+    }, 200);
   };
 
   const handleSubcategoryClick = (categoryName, subcategoryName, categories) => {
@@ -166,9 +177,11 @@ export default function NavigationBar() {
             <div
               key={index}
               className="relative"
+              onMouseEnter={() => handleCategoryMouseEnter(index)}
+              onMouseLeave={() => handleCategoryMouseLeave(index)}
+              data-category-wrapper={index}
             >
               <button
-                onClick={() => handleCategoryClick(index)}
                 className="text-gray-700 font-semibold text-xl md:text-2xl px-6 py-3 hover:bg-blue-100 rounded-lg transition-all duration-200 min-w-[140px]"
                 style={{ 
                   backgroundColor: activeDropdown === index ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
@@ -179,20 +192,25 @@ export default function NavigationBar() {
               </button>
               
               {activeDropdown === index && category.hasSubmenu && (
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 min-w-[240px]">
-                  {category.subcategories.map((subcategory, subIndex) => (
-                    <div
-                      key={subIndex}
-                      onClick={() => handleSubcategoryClick(category.name, subcategory.name, subcategory.categories)}
-                      className={`px-5 py-4 text-gray-700 cursor-pointer transition-colors duration-200 ${
-                        subcategory.name === "Próximamente" || subcategory.categories.length === 0
-                          ? 'opacity-60 cursor-not-allowed'
-                          : 'hover:bg-gray-100'
-                      }`}
-                    >
-                      <span className="font-semibold text-lg">{subcategory.name}</span>
-                    </div>
-                  ))}
+                <div 
+                  className="absolute top-full left-0 pt-2 bg-transparent z-50"
+                  onMouseEnter={() => handleCategoryMouseEnter(index)}
+                >
+                  <div className="bg-white rounded-lg shadow-xl border border-gray-200 min-w-[240px]">
+                    {category.subcategories.map((subcategory, subIndex) => (
+                      <div
+                        key={subIndex}
+                        onClick={() => handleSubcategoryClick(category.name, subcategory.name, subcategory.categories)}
+                        className={`px-5 py-4 text-gray-700 cursor-pointer transition-colors duration-200 ${
+                          subcategory.name === "Próximamente" || subcategory.categories.length === 0
+                            ? 'opacity-60 cursor-not-allowed'
+                            : 'hover:bg-gray-100'
+                        }`}
+                      >
+                        <span className="font-semibold text-lg">{subcategory.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

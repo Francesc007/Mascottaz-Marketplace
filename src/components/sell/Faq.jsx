@@ -62,7 +62,7 @@ export default function Faq() {
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-screen-2xl mx-auto px-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
         <motion.div
           initial="initial"
           whileInView="animate"
@@ -148,6 +148,7 @@ export default function Faq() {
     </section>
   );
 }
+
 
 
 

@@ -201,7 +201,7 @@ export default function SellerRegisterPage() {
 
   return (
     <div className="min-h-screen py-8" style={{ backgroundColor: '#fffaf0' }}>
-      <div className="max-w-2xl mx-auto px-4">
+      <div className="max-w-2xl mx-auto px-2 md:px-4">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
             <Image

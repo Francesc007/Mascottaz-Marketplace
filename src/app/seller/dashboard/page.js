@@ -153,7 +153,7 @@ export default function SellerDashboardPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fffaf0' }}>
       <header className="shadow-sm" style={{ backgroundColor: 'transparent' }}>
-        <div className="max-w-screen-2xl mx-auto px-8">
+        <div className="max-w-screen-2xl mx-auto px-2 md:px-4">
           <div className="flex flex-col items-center py-4">
             <div className="flex items-center justify-center mb-4">
               <Link href="/" className="cursor-pointer">
@@ -201,7 +201,7 @@ export default function SellerDashboardPage() {
         </div>
       </header>
 
-      <div className="max-w-screen-2xl mx-auto px-8 py-8">
+      <div className="max-w-screen-2xl mx-auto px-2 md:px-4 py-8">
         {/* Resumen de la semana y Rating */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 border border-blue-100">
@@ -397,6 +397,7 @@ export default function SellerDashboardPage() {
     </div>
   );
 }
+
 
 
 
