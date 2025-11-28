@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Camera, X } from "lucide-react";
+import { Camera, Save, X } from "lucide-react";
 import ProfileStorageService from "../../lib/profile/storage";
 
 export default function BannerUpload({ 
@@ -13,6 +13,8 @@ export default function BannerUpload({
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [position, setPosition] = useState(bannerPosition);
+  const [tempPosition, setTempPosition] = useState(bannerPosition);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startPosition, setStartPosition] = useState(0);
   const fileInputRef = useRef(null);
@@ -25,9 +27,12 @@ export default function BannerUpload({
     const result = await ProfileStorageService.uploadBanner(file, userId);
     
     if (result.success) {
+      setPosition(0);
+      setTempPosition(0);
+      setHasUnsavedChanges(false);
       onBannerUpdate({
         banner_url: result.url,
-        banner_position: position
+        banner_position: 0
       });
     }
     
@@ -40,7 +45,7 @@ export default function BannerUpload({
   const handleMouseDown = (e) => {
     setDragging(true);
     setStartY(e.clientY);
-    setStartPosition(position);
+    setStartPosition(tempPosition);
   };
 
   const handleMouseMove = (e) => {
@@ -48,17 +53,29 @@ export default function BannerUpload({
     
     const deltaY = e.clientY - startY;
     const newPosition = Math.max(-50, Math.min(50, startPosition + (deltaY / 5)));
-    setPosition(newPosition);
+    setTempPosition(newPosition);
+    setHasUnsavedChanges(newPosition !== position);
   };
 
   const handleMouseUp = () => {
     if (dragging) {
       setDragging(false);
-      onBannerUpdate({
-        banner_url: bannerUrl,
-        banner_position: position
-      });
     }
+  };
+
+  const handleSavePosition = () => {
+    setPosition(tempPosition);
+    setHasUnsavedChanges(false);
+    setDragging(false); // Asegurar que se detenga el arrastre
+    onBannerUpdate({
+      banner_url: bannerUrl,
+      banner_position: tempPosition
+    });
+  };
+
+  const handleCancelPosition = () => {
+    setTempPosition(position);
+    setHasUnsavedChanges(false);
   };
 
   return (
@@ -70,18 +87,20 @@ export default function BannerUpload({
     >
       {bannerUrl ? (
         <div
-          className="absolute inset-0 cursor-move"
+          className={`absolute inset-0 ${hasUnsavedChanges ? 'cursor-move' : 'cursor-default'}`}
           style={{
             backgroundImage: `url(${bannerUrl})`,
             backgroundSize: 'cover',
-            backgroundPosition: `center ${position}%`,
+            backgroundPosition: `center ${tempPosition}%`,
             backgroundRepeat: 'no-repeat'
           }}
-          onMouseDown={handleMouseDown}
+          onMouseDown={hasUnsavedChanges ? handleMouseDown : undefined}
         >
           {dragging && (
-            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-              <p className="text-white font-semibold">Ajustando posición...</p>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white bg-opacity-90 px-4 py-2 rounded-lg shadow-lg">
+                <p className="text-gray-800 font-semibold">Ajustando posición...</p>
+              </div>
             </div>
           )}
         </div>
@@ -91,21 +110,41 @@ export default function BannerUpload({
         </div>
       )}
 
-      {/* Botón de subir/cambiar banner */}
-      <label className="absolute bottom-4 right-4 bg-white rounded-full p-3 shadow-lg hover:bg-gray-50 transition-colors cursor-pointer">
-        <Camera className="w-5 h-5 text-gray-700" />
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={uploading}
-        />
-      </label>
+      {/* Botones de guardar/cancelar y cámara cuando hay cambios sin guardar */}
+      {hasUnsavedChanges && !dragging ? (
+        <div className="absolute bottom-4 right-4 flex gap-2 z-10">
+          <button
+            onClick={handleCancelPosition}
+            className="bg-gray-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+          >
+            <X className="w-4 h-4" />
+            Cancelar
+          </button>
+          <button
+            onClick={handleSavePosition}
+            className="bg-green-600 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            Guardar
+          </button>
+        </div>
+      ) : (
+        /* Botón de subir/cambiar banner */
+        <label className="absolute bottom-4 right-4 bg-white rounded-full p-3 shadow-lg hover:bg-gray-50 transition-colors cursor-pointer z-10">
+          <Camera className="w-5 h-5 text-gray-700" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={uploading}
+          />
+        </label>
+      )}
 
       {uploading && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
           <div className="text-white text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
             <p>Subiendo banner...</p>
@@ -115,4 +154,6 @@ export default function BannerUpload({
     </div>
   );
 }
+
+
 

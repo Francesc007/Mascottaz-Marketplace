@@ -70,3 +70,5 @@ CREATE TRIGGER update_vendors_updated_at_trigger
 
 
 
+
+
