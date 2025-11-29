@@ -6,6 +6,7 @@ import { createClient } from "../../../lib/supabaseClient";
 import Link from "next/link";
 import Image from "next/image";
 import { Store, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerLoginPage() {
   const router = useRouter();
@@ -57,7 +58,38 @@ export default function SellerLoginPage() {
       });
 
       if (loginError) {
-        setError(loginError.message);
+        const msg = loginError.message?.toLowerCase() || "";
+
+        // Manejo especial: correo no confirmado
+        if (msg.includes("email not confirmed") || msg.includes("email_not_confirmed")) {
+          try {
+            // Reenviar correo de confirmación
+            await supabase.auth.resend({
+              type: "signup",
+              email,
+              options: {
+                emailRedirectTo:
+                  typeof window !== "undefined"
+                    ? `${window.location.origin}/seller/login`
+                    : undefined,
+              },
+            });
+
+            setError(
+              "Tu correo aún no ha sido confirmado. Te hemos enviado un nuevo correo de confirmación. Revisa tu bandeja de entrada y spam; después de confirmar, vuelve a iniciar sesión aquí."
+            );
+          } catch (resendError) {
+            console.error("Error reenviando correo de confirmación:", resendError);
+            setError(
+              "Tu correo aún no ha sido confirmado y no pudimos reenviar el correo automáticamente. Por favor, revisa tu correo anterior o contacta a soporte."
+            );
+          }
+
+          setLoading(false);
+          return;
+        }
+
+        setError(loginError.message || "Error al iniciar sesión. Intenta de nuevo.");
         setLoading(false);
         return;
       }
@@ -185,6 +217,8 @@ export default function SellerLoginPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import Benefits from "@/components/sell/Benefits";
-import Commissions from "@/components/sell/Commissions";
-import Faq from "@/components/sell/Faq";
-import CallToAction from "@/components/sell/CallToAction";
+import Benefits from "../../components/sell/Benefits";
+import Commissions from "../../components/sell/Commissions";
+import Faq from "../../components/sell/Faq";
+import CallToAction from "../../components/sell/CallToAction";
 import { Store, ArrowRight } from "lucide-react";
 
 const fadeUp = {

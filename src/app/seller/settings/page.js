@@ -27,6 +27,7 @@ import {
   Lock
 } from "lucide-react";
 import StorageService from "../../../lib/storage";
+import Footer from "../../../components/Footer";
 
 export default function SellerSettingsPage() {
   const router = useRouter();
@@ -46,7 +47,8 @@ export default function SellerSettingsPage() {
     phone: "",
     email: "",
     address: "",
-    description: ""
+    description: "",
+    return_policy: ""
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -102,7 +104,8 @@ export default function SellerSettingsPage() {
         phone: vendorData.phone || "",
         email: vendorData.email || "",
         address: vendorData.address || "",
-        description: vendorData.description || ""
+        description: vendorData.description || "",
+        return_policy: vendorData.return_policy || ""
       });
       
       if (vendorData.avatar_url) {
@@ -220,7 +223,8 @@ export default function SellerSettingsPage() {
           phone: formData.phone.trim(),
           email: formData.email.trim(),
           address: formData.address.trim(),
-          description: formData.description.trim()
+          description: formData.description.trim(),
+          return_policy: formData.return_policy.trim()
         })
         .eq("user_id", user.id);
 
@@ -676,6 +680,44 @@ export default function SellerSettingsPage() {
             </form>
           </div>
 
+          {/* Políticas de Devolución y Reembolso */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Políticas de Devolución y Reembolso
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Describe tus políticas de devolución y reembolso. Esta información será visible para los compradores y les ayudará a entender tus términos antes de realizar una compra.
+            </p>
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Políticas de Devolución y Reembolso
+                </label>
+                <textarea
+                  value={formData.return_policy}
+                  onChange={(e) => setFormData({ ...formData, return_policy: e.target.value })}
+                  rows={8}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                  placeholder="Ejemplo:&#10;&#10;• Plazo para devoluciones: 30 días desde la recepción del producto&#10;• Condiciones: El producto debe estar en su estado original, sin uso y con empaque original&#10;• Costos de envío: El comprador cubre el costo de envío de devolución&#10;• Reembolsos: Se procesan en 5-10 días hábiles una vez recibido el producto&#10;• Productos no elegibles: Alimentos, productos de higiene personal, productos personalizados&#10;&#10;Para más información, contáctame directamente."
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Sé claro y específico sobre tus políticas. Esto genera confianza y evita malentendidos con los compradores.
+                </p>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? "Guardando..." : "Guardar Políticas"}
+                </button>
+              </div>
+            </form>
+          </div>
+
           {/* Cambiar Contraseña */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
@@ -858,17 +900,16 @@ export default function SellerSettingsPage() {
           </div>
 
           {/* Eliminar Cuenta */}
-          <div className="text-center pt-4">
-            <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>
-              ¿Ya no deseas continuar?{" "}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+            <div className="pt-6 border-t border-gray-200">
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="underline font-medium hover:opacity-80 transition-opacity"
-                style={{ color: 'var(--brand-blue)', fontFamily: 'var(--font-body)' }}
+                className="text-sm font-medium transition-colors hover:opacity-80"
+                style={{ color: 'var(--brand-blue)' }}
               >
                 Eliminar cuenta
               </button>
-            </p>
+            </div>
           </div>
         </div>
       </div>
@@ -925,7 +966,6 @@ export default function SellerSettingsPage() {
                         <option value="no_uso">Ya no uso la plataforma</option>
                         <option value="problemas_tecnicos">Problemas técnicos</option>
                         <option value="precio">Precios o comisiones</option>
-                        <option value="competencia">Encontré otra plataforma</option>
                         <option value="otro">Otro</option>
                       </select>
                     </div>
@@ -1001,6 +1041,8 @@ export default function SellerSettingsPage() {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   );
 }

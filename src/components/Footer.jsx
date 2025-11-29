@@ -75,15 +75,15 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-bold mb-4">Información Legal</h3>
               <div className="space-y-3">
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                <Link href="/terminos-condiciones" className="block hover:text-blue-300 transition-colors duration-200">
                   Términos y Condiciones
-                </a>
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                </Link>
+                <Link href="/privacidad" className="block hover:text-blue-300 transition-colors duration-200">
                   Aviso de Privacidad
-                </a>
-                <a href="#" className="block hover:text-blue-300 transition-colors duration-200">
+                </Link>
+                <Link href="/cookies" className="block hover:text-blue-300 transition-colors duration-200">
                   Política de Cookies
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -91,11 +91,23 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-bold mb-4">Ayuda y Soporte</h3>
               <div className="space-y-3">
+                <Link href="/how-we-protect" className="block transition-colors duration-200 hover:text-blue-800 font-medium">
+                  Cómo Protegemos tus Compras
+                </Link>
+                <Link href="/support" className="block transition-colors duration-200 hover:text-blue-800 font-medium">
+                  Contactar Soporte
+                </Link>
                 <Link href="/politica-envio" className="block transition-colors duration-200 hover:text-blue-800">
                   Política de Envío
                 </Link>
                 <Link href="/devoluciones" className="block transition-colors duration-200 hover:text-blue-800">
                   Política de Devoluciones
+                </Link>
+                <Link href="/pagos" className="block transition-colors duration-200 hover:text-blue-800">
+                  Política de Pagos
+                </Link>
+                <Link href="/garantias" className="block transition-colors duration-200 hover:text-blue-800">
+                  Política de Garantías
                 </Link>
                 <Link href="/faq" className="block transition-colors duration-200 hover:text-blue-800">
                   Preguntas Frecuentes (FAQ)

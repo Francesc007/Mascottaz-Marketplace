@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import useCartStore from "../store/cartStore";
 
 export default function ProductCard({ product, addToCart }) {
@@ -10,7 +11,9 @@ export default function ProductCard({ product, addToCart }) {
   const productDescription = product.descripcion || product.description;
   const productPrice = product.precio || product.price;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (addToCart) {
       addToCart(product);
     } else {
@@ -19,7 +22,8 @@ export default function ProductCard({ product, addToCart }) {
   };
 
   return (
-    <div className="border p-4 rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow">
+    <Link href={`/product/${product.id}`} className="block">
+      <div className="border p-4 rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow cursor-pointer">
       <div className="relative w-full aspect-square mb-4 rounded-lg overflow-hidden">
         <Image
           src={imageUrl}
@@ -41,6 +45,7 @@ export default function ProductCard({ product, addToCart }) {
       >
         Añadir al carrito
       </button>
-    </div>
+      </div>
+    </Link>
   );
 }

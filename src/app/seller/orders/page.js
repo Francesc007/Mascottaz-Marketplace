@@ -18,6 +18,7 @@ import {
   Eye,
   FileText
 } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerOrdersPage() {
   const router = useRouter();
@@ -409,6 +410,8 @@ export default function SellerOrdersPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

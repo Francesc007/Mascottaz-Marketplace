@@ -11,6 +11,8 @@ import PetPhotoGallery from "../../components/profile/PetPhotoGallery";
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../lib/auth";
 import ProfileAPI from "../../lib/profile/api";
+import ProfileStorageService from "../../lib/profile/storage";
+import { createClient } from "../../lib/supabaseClient";
 import { 
   Save,
   X,
@@ -18,7 +20,9 @@ import {
   Mail,
   Bell,
   Compass,
-  Settings
+  Settings,
+  Trash2,
+  AlertCircle
 } from "lucide-react";
 
 export default function PerfilPage() {
@@ -38,6 +42,13 @@ export default function PerfilPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteFeedback, setDeleteFeedback] = useState({
+    reason: "",
+    comments: ""
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -168,6 +179,121 @@ export default function PerfilPage() {
       }
     } catch (err) {
       console.error("Error actualizando avatar:", err);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!showConfirmDelete) {
+      setShowConfirmDelete(true);
+      return;
+    }
+
+    setDeleting(true);
+    setError("");
+    
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setError("No estás autenticado");
+        setDeleting(false);
+        return;
+      }
+
+      // Guardar feedback antes de eliminar
+      if (deleteFeedback.reason || deleteFeedback.comments) {
+        try {
+          const { error: checkError } = await supabase
+            .from("account_deletion_feedback")
+            .select("id")
+            .limit(1);
+          
+          if (!checkError) {
+            await supabase
+              .from("account_deletion_feedback")
+              .insert({
+                user_id: user.id,
+                user_type: "buyer",
+                reason: deleteFeedback.reason,
+                comments: deleteFeedback.comments,
+                created_at: new Date().toISOString()
+              });
+          }
+        } catch (feedbackError) {
+          console.warn("No se pudo guardar el feedback (la tabla puede no existir):", feedbackError);
+        }
+      }
+
+      // Eliminar imágenes del perfil
+      if (profile?.banner_url) {
+        try {
+          const bannerPath = profile.banner_url.split('/').slice(-2).join('/');
+          await ProfileStorageService.deleteImage(bannerPath, 'petplace-images');
+        } catch (err) {
+          console.warn("Error eliminando banner:", err);
+        }
+      }
+
+      if (profile?.avatar_url) {
+        try {
+          const avatarPath = profile.avatar_url.split('/').slice(-2).join('/');
+          await ProfileStorageService.deleteImage(avatarPath, 'petplace-images');
+        } catch (err) {
+          console.warn("Error eliminando avatar:", err);
+        }
+      }
+
+      // Eliminar fotos de mascotas y sus imágenes
+      const petPhotosResult = await ProfileAPI.getPetPhotos(user.id);
+      if (petPhotosResult.success && petPhotosResult.data) {
+        for (const photo of petPhotosResult.data) {
+          if (photo.image_path || photo.image_url) {
+            try {
+              const imagePath = photo.image_path || photo.image_url.split('/').slice(-1)[0];
+              const bucketName = photo.bucket_name || 'mascotas_gallery';
+              await ProfileStorageService.deleteImage(imagePath, bucketName);
+            } catch (err) {
+              console.warn("Error eliminando foto de mascota:", err);
+            }
+          }
+          // Eliminar el registro de la foto
+          await ProfileAPI.deletePetPhoto(photo.id);
+        }
+      }
+
+      // Eliminar likes de fotos del usuario
+      try {
+        await supabase
+          .from('pet_photo_likes')
+          .delete()
+          .eq('user_id', user.id);
+      } catch (err) {
+        console.warn("Error eliminando likes:", err);
+      }
+
+      // Eliminar perfil del usuario
+      const { error: deleteProfileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (deleteProfileError) {
+        console.warn("Error eliminando perfil:", deleteProfileError);
+      }
+
+      // Cerrar sesión y eliminar cuenta de auth
+      await supabase.auth.signOut();
+      
+      // Limpiar store
+      useAuthStore.getState().logout();
+
+      // Redirigir al home
+      router.push("/");
+    } catch (err) {
+      console.error("Error eliminando cuenta:", err);
+      setError("❌ Error al eliminar la cuenta: " + (err?.message || ''));
+      setDeleting(false);
     }
   };
 
@@ -436,6 +562,20 @@ export default function PerfilPage() {
                       Guardar
                     </button>
                   </div>
+                  
+                  {/* Enlace para eliminar cuenta */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setEditing(false);
+                        setShowDeleteModal(true);
+                      }}
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: 'var(--brand-blue)' }}
+                    >
+                      Eliminar cuenta
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -443,8 +583,8 @@ export default function PerfilPage() {
         )}
 
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <p className="text-orange-800 text-sm">{error}</p>
           </div>
         )}
 
@@ -501,6 +641,134 @@ export default function PerfilPage() {
           <PetPhotoGallery userId={currentUser.id} />
         </div>
       </main>
+
+      {/* Modal de Eliminación de Cuenta */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--brand-blue)' }}>
+                  <Trash2 className="w-6 h-6" />
+                  Eliminar Cuenta
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setShowConfirmDelete(false);
+                    setDeleteFeedback({ reason: "", comments: "" });
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {!showConfirmDelete ? (
+                <>
+                  <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: 'var(--interaction-blue-light)', border: `1px solid var(--interaction-blue-dark)` }}>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--brand-blue)' }} />
+                      <div>
+                        <p className="font-semibold mb-1" style={{ color: 'var(--brand-blue)' }}>
+                          Esta acción eliminará permanentemente tu cuenta y todos tus datos
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          Todos tus datos personales, fotos de mascotas y contenido serán eliminados de forma permanente. Esta acción no se puede deshacer.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        ¿Por qué estás eliminando tu cuenta? (Opcional)
+                      </label>
+                      <select
+                        value={deleteFeedback.reason}
+                        onChange={(e) => setDeleteFeedback({ ...deleteFeedback, reason: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Selecciona una razón</option>
+                        <option value="no_uso">Ya no uso la plataforma</option>
+                        <option value="problemas_tecnicos">Problemas técnicos</option>
+                        <option value="privacidad">Preocupaciones de privacidad</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Comentarios adicionales (Opcional)
+                      </label>
+                      <textarea
+                        value={deleteFeedback.comments}
+                        onChange={(e) => setDeleteFeedback({ ...deleteFeedback, comments: e.target.value })}
+                        rows={4}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ayúdanos a mejorar compartiendo tus comentarios..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setShowDeleteModal(false);
+                        setDeleteFeedback({ reason: "", comments: "" });
+                      }}
+                      className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      className="flex-1 px-6 py-3 rounded-lg transition-colors font-medium text-white"
+                      style={{ backgroundColor: 'var(--brand-blue)' }}
+                    >
+                      Continuar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: 'var(--interaction-blue-light)', border: `1px solid var(--interaction-blue-dark)` }}>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--brand-blue)' }} />
+                      <div>
+                        <p className="font-semibold mb-1" style={{ color: 'var(--brand-blue)' }}>
+                          Confirmación Final
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          ¿Estás completamente seguro de que deseas eliminar tu cuenta? Esta acción es irreversible y eliminará todos tus datos, fotos y contenido.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setShowConfirmDelete(false)}
+                      className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      No, Cancelar
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting}
+                      className="flex-1 px-6 py-3 rounded-lg transition-colors font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: 'var(--brand-blue)' }}
+                    >
+                      {deleting ? "Eliminando..." : "Sí, Eliminar Cuenta"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -15,6 +15,7 @@ import {
   Clock,
   CheckCircle2
 } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerMessagesPage() {
   const router = useRouter();
@@ -361,6 +362,8 @@ export default function SellerMessagesPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

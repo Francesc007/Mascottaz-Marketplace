@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "../../../lib/supabaseClient";
 import Link from "next/link";
 import Image from "next/image";
-import { Store, Package, ShoppingCart, DollarSign, TrendingUp, Settings, CreditCard, LogOut, Star, MessageSquare } from "lucide-react";
+import { Store, Package, ShoppingCart, DollarSign, TrendingUp, Settings, CreditCard, LogOut, Star, MessageSquare, Mail, Bell } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerDashboardPage() {
   const router = useRouter();
@@ -177,7 +178,7 @@ export default function SellerDashboardPage() {
                 {vendor?.avatar_url ? (
                   <img 
                     src={vendor.avatar_url} 
-                    alt="Foto de perfil" 
+                    alt="Foto de la tienda" 
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -190,13 +191,49 @@ export default function SellerDashboardPage() {
                 </h1>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md font-medium"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push("/seller/notifications")}
+                className="relative p-2 rounded-lg bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200"
+                title="Notificaciones"
+              >
+                <Bell className="w-5 h-5" style={{ color: 'var(--brand-blue)' }} />
+                {stats.pendingOrders > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {stats.pendingOrders}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/seller/messages")}
+                className="relative p-2 rounded-lg bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200"
+                title="Mensajes"
+              >
+                <Mail className="w-5 h-5" style={{ color: 'var(--brand-blue)' }} />
+                {stats.unreadMessages > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {stats.unreadMessages}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/seller/settings")}
+                className="p-2 rounded-lg bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200"
+                title="Editar perfil de la tienda"
+              >
+                <Settings className="w-5 h-5" style={{ color: 'var(--brand-blue)' }} />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -357,43 +394,10 @@ export default function SellerDashboardPage() {
               Reseñas y calificaciones
             </p>
           </Link>
-
-          <Link
-            href="/seller/messages"
-            className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 transform hover:-translate-y-1 group"
-          >
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 relative" style={{ backgroundColor: 'var(--interaction-blue-light)' }}>
-              <MessageSquare className="w-7 h-7" style={{ color: 'var(--brand-blue)' }} />
-              {stats.unreadMessages > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {stats.unreadMessages}
-                </span>
-              )}
-            </div>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--brand-blue)', fontFamily: 'var(--font-heading)' }}>
-              Mensajes
-            </h3>
-            <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>
-              Preguntas de compradores
-            </p>
-          </Link>
-
-          <Link
-            href="/seller/settings"
-            className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 transform hover:-translate-y-1 group"
-          >
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--interaction-blue-light)' }}>
-              <Settings className="w-7 h-7" style={{ color: 'var(--brand-blue)' }} />
-            </div>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--brand-blue)', fontFamily: 'var(--font-heading)' }}>
-              Configuración
-            </h3>
-            <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>
-              Ajusta tu perfil y preferencias
-            </p>
-          </Link>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

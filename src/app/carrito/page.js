@@ -1,14 +1,52 @@
 "use client";
 
+import { useState, useEffect, useMemo } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import NavigationBar from "../../components/NavigationBar";
 import Link from "next/link";
 import useCartStore from "../../store/cartStore";
+import { createClient } from "../../lib/supabaseClient";
+import SellerBadge from "../../components/SellerBadge";
+import { MessageSquare, Shield, CheckCircle2 } from "lucide-react";
 
 export default function CartPage() {
   const { items: cartItems, removeItem, getTotal } = useCartStore();
+  const supabase = useMemo(() => createClient(), []);
+  const [sellersInfo, setSellersInfo] = useState({});
   const total = getTotal();
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      loadSellersInfo();
+    }
+  }, [cartItems, supabase]);
+
+  const loadSellersInfo = async () => {
+    try {
+      const sellerIds = [...new Set(cartItems.map(item => item.id_vendedor || item.seller_id).filter(Boolean))];
+      
+      if (sellerIds.length === 0) return;
+
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, seller_verified")
+        .in("user_id", sellerIds);
+
+      const sellersMap = {};
+      profilesData?.forEach(p => {
+        sellersMap[p.user_id] = { verified: p.seller_verified || false };
+      });
+
+      setSellersInfo(sellersMap);
+    } catch (err) {
+      console.error("Error cargando info de vendedores:", err);
+    }
+  };
+
+  const hasVerifiedSeller = Object.values(sellersInfo).some(s => s.verified);
+  const firstItem = cartItems.find(item => item.id_vendedor || item.seller_id);
+  const firstSellerId = firstItem?.id_vendedor || firstItem?.seller_id;
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fffaf0' }}>
@@ -87,8 +125,37 @@ export default function CartPage() {
               </div>
 
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                  <h2 className="text-xl font-bold mb-4">Resumen</h2>
+                <div className="space-y-4 sticky top-4">
+                  {/* Banner de Protección */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-md p-4 text-white">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        {hasVerifiedSeller && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span className="text-sm font-semibold">Vendedor Verificado</span>
+                          </div>
+                        )}
+                        <p className="text-sm mb-3">
+                          Si el vendedor no responde en 48h, Mascottaz interviene
+                        </p>
+                        {firstSellerId && (
+                          <Link
+                            href={`/messages?sellerId=${firstSellerId}&productId=${cartItems[0]?.id}`}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                            Contactar al vendedor
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Resumen */}
+                  <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h2 className="text-xl font-bold mb-4">Resumen</h2>
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
@@ -112,6 +179,7 @@ export default function CartPage() {
                   >
                     Proceder al Pago
                   </button>
+                  </div>
                 </div>
               </div>
             </div>

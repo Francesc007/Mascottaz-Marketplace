@@ -16,6 +16,7 @@ import {
   Building2,
   Wallet
 } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerBillingPage() {
   const router = useRouter();
@@ -340,6 +341,8 @@ export default function SellerBillingPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

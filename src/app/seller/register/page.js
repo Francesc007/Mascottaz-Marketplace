@@ -6,6 +6,7 @@ import { createClient } from "../../../lib/supabaseClient";
 import Link from "next/link";
 import Image from "next/image";
 import { Store, User, Mail, Phone, MapPin, FileText, Loader2, CheckCircle2, AlertCircle, Lock, Eye, EyeOff } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerRegisterPage() {
   const router = useRouter();
@@ -109,16 +110,24 @@ export default function SellerRegisterPage() {
 
     try {
       let user;
+      let justRegistered = false;
 
       if (!isAuthenticated) {
-        // Crear cuenta de usuario
+        // Asegurarnos de cerrar cualquier sesión previa antes de registrar un nuevo vendedor
+        await supabase.auth.signOut();
+
+        // Crear cuenta de usuario (solo registro, sin crear vendor todavía)
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: formData.accountEmail.trim(),
           password: formData.password,
           options: {
             data: {
               user_type: "seller"
-            }
+            },
+            emailRedirectTo:
+              typeof window !== "undefined"
+                ? `${window.location.origin}/seller/login`
+                : undefined
           }
         });
 
@@ -135,6 +144,7 @@ export default function SellerRegisterPage() {
         }
 
         user = signUpData.user;
+        justRegistered = true;
       } else {
         const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
         if (userError || !currentUser) {
@@ -143,6 +153,18 @@ export default function SellerRegisterPage() {
           return;
         }
         user = currentUser;
+      }
+
+      // Si el usuario acaba de registrarse, es posible que aún no tenga sesión activa
+      // y la política RLS de vendors no permitirá insertar. En lugar de forzar el insert aquí,
+      // lo guiamos a iniciar sesión y completar su perfil de vendedor después.
+      if (justRegistered) {
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/seller/login");
+        }, 2000);
+        setSubmitting(false);
+        return;
       }
 
       // Verificar que no exista un perfil
@@ -479,6 +501,8 @@ export default function SellerRegisterPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

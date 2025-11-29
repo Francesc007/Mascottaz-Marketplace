@@ -20,6 +20,7 @@ import {
   Image as ImageIcon
 } from "lucide-react";
 import StorageService from "../../../lib/storage";
+import Footer from "../../../components/Footer";
 
 export default function SellerProductsPage() {
   const router = useRouter();
@@ -683,6 +684,8 @@ export default function SellerProductsPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

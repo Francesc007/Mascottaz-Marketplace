@@ -12,6 +12,7 @@ import {
   Send,
   StarIcon
 } from "lucide-react";
+import Footer from "../../../components/Footer";
 
 export default function SellerReviewsPage() {
   const router = useRouter();
@@ -318,6 +319,8 @@ export default function SellerReviewsPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }
